@@ -16,7 +16,8 @@
 #include "aboutdialog.h"
 #include "getsensordata.h"
 #include "plotcurves.h"
-#include "motorcontrol.h"
+//#include "motorcontrol.h"
+class MotorControl;
 //#include <QtSerialPort/QSerialPort>
 //#include "myglwidget.h"
 //#include "C:/Advantech/DAQNavi/Inc/bdaqctrl.h"
@@ -31,6 +32,7 @@
 
 // set the plot interval
 #define TIME_PLOT_INTERVAL 200
+
 
 namespace Ui {
 class MainWindow;
@@ -72,6 +74,8 @@ private slots:
     void setLine9EditValue();
     void setLine10EditValue();
     void Plot_Init();
+    void openSerialSucc();
+    void openSerialFail();
 
     void on_Openglaction_triggered();
 
@@ -80,7 +84,6 @@ private slots:
     void on_dataStopGetButton_clicked();
 
 private:
-    Ui::MainWindow *ui;
     aboutdialog aboutdlg;
     //int QByteArray2Int(QByteArray temp);
     //static char ConvertHexChar(char ch);
@@ -91,10 +94,12 @@ private:
     unsigned int rece_timerdly;
     GetSensordata *getsensordata;
     MotorControl *motorcontrol;
+    Ui::MainWindow *ui;
 
 signals:
-    void serialInitial(int);
-    void serialCloseSig(int);
+    void serialInitial(const QString portName, const QString baudRate, const QString dataBits, const QString stopBits);
+    void serialCloseSig();
+    void serialControl(bool TensionOrAngle, unsigned int *Data);
 };
 
 #endif // MAINWINDOW_H

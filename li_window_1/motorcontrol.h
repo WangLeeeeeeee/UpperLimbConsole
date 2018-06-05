@@ -7,7 +7,7 @@
 #include "mainwindow.h"
 #include <QMessageBox>
 
-Ui::MainWindow *ui;
+//Ui::MainWindow *ui;
 
 class MotorControl:public QThread
 {
@@ -25,8 +25,13 @@ private:
 
 private slots:
     void readMyCom();
-    void SerialInit();
+    void SerialInit(const QString portName, const QString baudRate, const QString dataBits, const QString stopBits);
     void SerialClose();
+    void MotorParamRec(bool TensionOrAngle, unsigned int *Data);
+
+signals:
+    void SerialOpenSucc();
+    void SerialOpenFail();
 };
 
 #endif // MOTORCONTROL_H

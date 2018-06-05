@@ -8,6 +8,8 @@
 #include <QVariant>
 #include <ActiveQt/QAxObject>
 #include <qdebug.h>
+#include "motorcontrol.h"
+
 
 unsigned int shift_x_tension = 0;
 unsigned int shift_x_angle = 0;
@@ -15,7 +17,7 @@ unsigned int shift_x_pressure = 0;
 
 #define RcvBufSize 380
 unsigned int RcvBufNum;
-unsigned char RcvBuf[RcvBufSize];//
+unsigned char RcvBuf[RcvBufSize];
 bool new_flag=0;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -29,6 +31,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     getsensordata = new GetSensordata;
     motorcontrol = new MotorControl;
+
+    // Before connect object must be instantiation!!!
+    connect(this, SIGNAL(serialInitial(const QString, const QString, const QString, const QString)),
+            motorcontrol, SLOT(SerialInit(const QString, const QString, const QString, const QString)));
+    connect(this, SIGNAL(serialCloseSig()), motorcontrol, SLOT(SerialClose()));
+    connect(motorcontrol, SIGNAL(SerialOpenSucc()), this, SLOT(openSerialSucc()));
+    connect(motorcontrol, SIGNAL(SerialOpenFail()), this, SLOT(openSerialFail()));
+    connect(this, SIGNAL(serialControl(bool,uint*)), motorcontrol, SLOT(MotorParamRec(bool,uint*)));
 }
 
 MainWindow::~MainWindow()
@@ -302,8 +312,12 @@ void MainWindow::startInit()
     connect(ui->horizontalSlider9,SIGNAL(valueChanged(int)),this,SLOT(setLine9EditValue()));
     connect(ui->horizontalSlider10,SIGNAL(valueChanged(int)),this,SLOT(setLine10EditValue()));
 
-    connect(this, SIGNAL(serialInitial()), motorcontrol, SLOT(SerialInit()));
-    connect(this, SIGNAL(serialCloseSig()), motorcontrol, SLOT(SerialClose()));
+    //connect(this, SIGNAL(serialInitial(const QString, const QString, const QString, const QString)),
+            //motorcontrol, SLOT(SerialInit(const QString, const QString, const QString, const QString)));
+    //connect(this, SIGNAL(serialCloseSig()), motorcontrol, SLOT(SerialClose()));
+    //connect(motorcontrol, SIGNAL(SerialOpenSucc()), this, SLOT(openSerialSucc()));
+    //connect(motorcontrol, SIGNAL(SerialOpenFail()), this, SLOT(openSerialFail()));
+
 }
 
 // Set close button and save button action
@@ -326,7 +340,8 @@ void MainWindow::setComboxEnable(bool status)
 //
 void MainWindow::on_actionOpen_triggered()
 {
-    emit serialInitial(123);
+    emit serialInitial(ui->portNameComboBox->currentText(),ui->baudRateCombox->currentText(),
+                       ui->dataBitsComboBox->currentText(),ui->stopBitsComboBox->currentText());
 /*
     serial.setPortName(ui->portNameComboBox->currentText());
 
@@ -383,7 +398,7 @@ void MainWindow::on_actionClose_triggered()
     //timer->stop();
     //rece_timer->stop();
     //plot_timer->stop();
-    emit serialClose(123);
+    emit serialCloseSig();
     //serial.close();
     setComboxEnable(true);
 
@@ -876,231 +891,39 @@ void MainWindow::on_actionClean_triggered()
 
 void MainWindow::on_sendmsgButton_clicked()
 {
-    motorcontrol->start();
-    /*
-    //QString SendData="V1000\r";
-    QString SendData;
-    unsigned int speed = 2000;
-    SendData = QString::number(speed);
-    SendData = "V" + SendData + "\r";
-    serial.write(SendData.toLatin1());
-*/
-
-    /*
-    unsigned int speed;
-
-    speed = 0;
-
-    // Send some return to clean command before
-    for(int i=0; i<5; i++)
+    bool TensionOrAngle=0;
+    unsigned int sendData[6];
+    if(ui->joint_RadioButton->isChecked())
     {
-        myCom->write(RETURN);
+        TensionOrAngle = 1;
+        sendData[0] = ui->sendMsgLineEdit7->text().toUInt();
+        sendData[1] = ui->sendMsgLineEdit8->text().toUInt();
+        sendData[2] = ui->sendMsgLineEdit9->text().toUInt();
+        sendData[3] = ui->sendMsgLineEdit10->text().toUInt();
+        sendData[4] = 0;
+        sendData[5] = 0;
+        emit serialControl(TensionOrAngle, sendData);
+        motorcontrol->start();
     }
-
-    // Speed control test
-    for(int i=0; i<10; i++)
+    else if(ui->cabel_RadioButton->isChecked())
     {
-        speed += 200;
-        myCom->write(V);
-        myCom->write(speed  /   1000    +   0x30);
-        myCom->write(speed  %   1000    /   100 +   0x30);
-        myCom->write(speed  %   100     /   10  +   0x30);
-        myCom->write(speed  %   10      +   0x30);
-        myCom->write(RETURN);
+        TensionOrAngle = 0;
+        sendData[0] = ui->sendMsgLineEdit->text().toUInt();
+        sendData[1] = ui->sendMsgLineEdit2->text().toUInt();
+        sendData[2] = ui->sendMsgLineEdit3->text().toUInt();
+        sendData[3] = ui->sendMsgLineEdit4->text().toUInt();
+        sendData[4] = ui->sendMsgLineEdit5->text().toUInt();
+        sendData[5] = ui->sendMsgLineEdit6->text().toUInt();
+        emit serialControl(TensionOrAngle, sendData);
+        motorcontrol->start();
     }
-    */
-    /*
-    QString Return = "\r";
-    QString Head = "SP";
-    QString speed_limit = "3000";
-    myCom->write(QString2Hex(Return));
-    myCom->write(QString2Hex(Return));
-    myCom->write(QString2Hex(Return));
-    myCom->write(QString2Hex(Return));
-    myCom->write(QString2Hex(Head));
-    myCom->write(QString2Hex(speed_limit));
-    */
-    /*
-    QString t="0";
-    QString neg="1";
-    QString head="ff";
-    QString end="aa";
-    QString cabel_con="01";
-    QString joint_con="02";
-
-    myCom->write(QString2Hex(head));//
-
-    //
-    if(ui->cabel_RadioButton->isChecked())
-    {
-        myCom->write(QString2Hex(cabel_con));
-
-        if(ui->horizontalSlider->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit->text().toAscii());
-        if(ui->horizontalSlider2->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit2->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit2->text().toAscii());
-        if(ui->horizontalSlider3->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit3->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit3->text().toAscii());
-        if(ui->horizontalSlider4->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit4->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit4->text().toAscii());
-        if(ui->horizontalSlider5->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit5->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit5->text().toAscii());
-        if(ui->horizontalSlider6->value()<1000)
-        {
-            myCom->write(t.toAscii());
-            myCom->write(ui->sendMsgLineEdit6->text().toAscii());
-        }
-        else
-            myCom->write(ui->sendMsgLineEdit6->text().toAscii());
-    }
-    //
     else
     {
-        myCom->write(QString2Hex(joint_con));
-        //x
-        if(ui->horizontalSlider7->value()<0)
-        {
-            myCom->write(neg.toAscii());
-            QString send_shx=QString("%1").arg(-(ui->horizontalSlider7->value()));
-
-            if(ui->horizontalSlider7->value()<-10)
-            {
-                myCom->write(send_shx.toAscii());
-            }
-            else
-            {
-                myCom->write(t.toAscii());
-                myCom->write(send_shx.toAscii());
-            }
-        }
-        else
-        {
-            myCom->write(t.toAscii());
-            if(ui->horizontalSlider7->value()<10)
-            {
-                myCom->write(t.toAscii());
-                myCom->write(ui->sendMsgLineEdit7->text().toAscii());
-            }
-            else
-                myCom->write(ui->sendMsgLineEdit7->text().toAscii());
-        }
-        //y
-        if(ui->horizontalSlider8->value()<0)
-        {
-            myCom->write(neg.toAscii());
-            QString send_shy=QString("%1").arg(-(ui->horizontalSlider8->value()));
-
-            if(ui->horizontalSlider8->value()<-10)
-            {
-                myCom->write(send_shy.toAscii());
-            }
-            else
-            {
-                myCom->write(t.toAscii());
-                myCom->write(send_shy.toAscii());
-            }
-        }
-        else
-        {
-            myCom->write(t.toAscii());
-            if(ui->horizontalSlider8->value()<10)
-            {
-                myCom->write(t.toAscii());
-                myCom->write(ui->sendMsgLineEdit8->text().toAscii());
-            }
-            else
-                myCom->write(ui->sendMsgLineEdit8->text().toAscii());
-        }
-        //z
-        if(ui->horizontalSlider9->value()<0)
-        {
-            myCom->write(neg.toAscii());
-            QString send_shz=QString("%1").arg(-(ui->horizontalSlider9->value()));
-
-            if(ui->horizontalSlider9->value()<-10)
-            {
-                myCom->write(send_shz.toAscii());
-            }
-            else
-            {
-                myCom->write(t.toAscii());
-                myCom->write(send_shz.toAscii());
-            }
-        }
-        else
-        {
-            myCom->write(t.toAscii());
-            if(ui->horizontalSlider9->value()<10)
-            {
-                myCom->write(t.toAscii());
-                myCom->write(ui->sendMsgLineEdit9->text().toAscii());
-            }
-            else
-                myCom->write(ui->sendMsgLineEdit9->text().toAscii());
-        }
-        //
-        if(ui->horizontalSlider10->value()<0)
-        {
-            myCom->write(neg.toAscii());
-            QString send_el=QString("%1").arg(-(ui->horizontalSlider10->value()));
-
-            if(ui->horizontalSlider10->value()<-10)
-            {
-                myCom->write(send_el.toAscii());
-            }
-            else
-            {
-                myCom->write(t.toAscii());
-                myCom->write(send_el.toAscii());
-            }
-        }
-        else
-        {
-            myCom->write(t.toAscii());
-            if(ui->horizontalSlider10->value()<10)
-            {
-                myCom->write(t.toAscii());
-                myCom->write(ui->sendMsgLineEdit10->text().toAscii());
-            }
-            else
-                myCom->write(ui->sendMsgLineEdit10->text().toAscii());
-        }
+        QMessageBox::critical(this,tr("wrong operation"),tr("choose Tension control or Joint control first!!!"),QMessageBox::Ok);
+        return;
     }
-
-    myCom->write(QString2Hex(end));
-
-    ui->statusBar->showMessage(tr(""));
-    */
-
 }
 
-
-//
 void MainWindow::plot()
 {
 
@@ -1307,4 +1130,14 @@ void MainWindow::on_dataStopGetButton_clicked()
     getsensordata->wait();
     ui->actionSave->setEnabled(true);
     plot_timer->stop();
+}
+
+void MainWindow::openSerialSucc()
+{
+    QMessageBox::information(this,tr("open sucessful"),tr("sucessful open com")+ui->portNameComboBox->currentText(),QMessageBox::Ok);
+}
+
+void MainWindow::openSerialFail()
+{
+    QMessageBox::critical(this,tr("open failed"),tr("cannot open com")+ui->portNameComboBox->currentText()+tr("\n com cannot be open or be used"),QMessageBox::Ok);
 }
