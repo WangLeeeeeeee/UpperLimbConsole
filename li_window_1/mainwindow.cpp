@@ -20,6 +20,8 @@ unsigned int RcvBufNum;
 unsigned char RcvBuf[RcvBufSize];
 bool new_flag=0;
 
+unsigned int MAXSPEED = 3000;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -33,12 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     motorcontrol = new MotorControl;
 
     // Before connect object must be instantiation!!!
-    connect(this, SIGNAL(serialInitial(const QString, const QString, const QString, const QString)),
-            motorcontrol, SLOT(SerialInit(const QString, const QString, const QString, const QString)));
-    connect(this, SIGNAL(serialCloseSig()), motorcontrol, SLOT(SerialClose()));
-    connect(motorcontrol, SIGNAL(SerialOpenSucc()), this, SLOT(openSerialSucc()));
-    connect(motorcontrol, SIGNAL(SerialOpenFail()), this, SLOT(openSerialFail()));
-    connect(this, SIGNAL(serialControl(bool,uint*)), motorcontrol, SLOT(MotorParamRec(bool,uint*)));
+    connect(this, SIGNAL(serialControl(bool,uint*)), motorcontrol, SLOT(UiParamRec(bool,uint*)));
+    connect(motorcontrol, SIGNAL(MotorParamSend(uint*)), this, SLOT(MotorSendControl(uint*)));
 }
 
 MainWindow::~MainWindow()
@@ -312,12 +310,6 @@ void MainWindow::startInit()
     connect(ui->horizontalSlider9,SIGNAL(valueChanged(int)),this,SLOT(setLine9EditValue()));
     connect(ui->horizontalSlider10,SIGNAL(valueChanged(int)),this,SLOT(setLine10EditValue()));
 
-    //connect(this, SIGNAL(serialInitial(const QString, const QString, const QString, const QString)),
-            //motorcontrol, SLOT(SerialInit(const QString, const QString, const QString, const QString)));
-    //connect(this, SIGNAL(serialCloseSig()), motorcontrol, SLOT(SerialClose()));
-    //connect(motorcontrol, SIGNAL(SerialOpenSucc()), this, SLOT(openSerialSucc()));
-    //connect(motorcontrol, SIGNAL(SerialOpenFail()), this, SLOT(openSerialFail()));
-
 }
 
 // Set close button and save button action
@@ -340,9 +332,6 @@ void MainWindow::setComboxEnable(bool status)
 //
 void MainWindow::on_actionOpen_triggered()
 {
-    emit serialInitial(ui->portNameComboBox->currentText(),ui->baudRateCombox->currentText(),
-                       ui->dataBitsComboBox->currentText(),ui->stopBitsComboBox->currentText());
-/*
     serial.setPortName(ui->portNameComboBox->currentText());
 
     if(ui->baudRateCombox->currentText()==tr("9600"))
@@ -375,31 +364,34 @@ void MainWindow::on_actionOpen_triggered()
     {
         connect(&serial,SIGNAL(readyRead()),this,SLOT(readMyCom()));
         QMessageBox::information(this,tr("open sucessful"),tr("sucessful open com")+ui->portNameComboBox->currentText(),QMessageBox::Ok);
+
+        // Set the motor the maxium speed
+        QString SendData;
+        SendData = QString::number(MAXSPEED);
+        SendData = "SP" + SendData + "\r";
+        for(int i=0; i<10; i++)
+        {
+            serial.write(SendData.toLatin1());
+        }
     }
     else
     {
         QMessageBox::critical(this,tr("open failed"),tr("cannot open com")+ui->portNameComboBox->currentText()+tr("\n com cannot be open or be used"),QMessageBox::Ok);
         return;
-    }*/
+    }
 
     setComboxEnable(false);
     ui->actionOpen->setEnabled(false);
     ui->actionAdd->setEnabled(false);
 
     setActionsEnable(true);
-
 }
 
 //
 void MainWindow::on_actionClose_triggered()
 {
-    //myCom->close();
-    //delete myCom;
-    //timer->stop();
-    //rece_timer->stop();
     //plot_timer->stop();
-    emit serialCloseSig();
-    //serial.close();
+    serial.close();
     setComboxEnable(true);
 
     ui->actionOpen->setEnabled(true);
@@ -422,18 +414,6 @@ void MainWindow::on_actionInfor_triggered()
 }
 
 
-/*
-void MainWindow::readMyCom()
-{
-    QByteArray temp = serial.readAll();
-    unsigned char ReceiveFlag = 0;
-    if(temp == "OK\r\n")
-    {
-        ReceiveFlag = 1;
-    }
-}
-*/
-
 void MainWindow::on_actionExit_triggered()
 {
     this->close();
@@ -441,7 +421,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionAdd_triggered()
 {
-    /*
+
     bool ok = false;
     QString portname;
 
@@ -450,7 +430,7 @@ void MainWindow::on_actionAdd_triggered()
         ui->portNameComboBox->addItem(portname);
         ui->statusBar->showMessage(tr(""));
     }
-    */
+
 }
 
 //save to excel file
@@ -1132,12 +1112,28 @@ void MainWindow::on_dataStopGetButton_clicked()
     plot_timer->stop();
 }
 
-void MainWindow::openSerialSucc()
+void MainWindow::readMyCom()
 {
-    QMessageBox::information(this,tr("open sucessful"),tr("sucessful open com")+ui->portNameComboBox->currentText(),QMessageBox::Ok);
+    QByteArray temp = serial.readAll();
+    if(temp == "OK\r\n")
+    {
+
+    }
 }
 
-void MainWindow::openSerialFail()
+void MainWindow::MotorSendControl(unsigned int *Motparam)
 {
-    QMessageBox::critical(this,tr("open failed"),tr("cannot open com")+ui->portNameComboBox->currentText()+tr("\n com cannot be open or be used"),QMessageBox::Ok);
+    QString SendData;
+    for(int i=0; i<10; i++)
+    {
+        // Motor 0
+        SendData = QString::number(Motparam[0]);
+        SendData = "0C" + SendData + "\r";
+        serial.write(SendData.toLatin1());
+
+        // Motor 1
+        SendData = QString::number(Motparam[1]);
+        SendData = "1C" + SendData + "\r";
+        serial.write(SendData.toLatin1());
+    }
 }

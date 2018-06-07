@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QDebug>
-#include <QtSerialPort/QSerialPort>
 #include "mainwindow.h"
 #include <QMessageBox>
 
@@ -17,21 +16,13 @@ public:
 
 private:
     void run();
-    int QByteArray2Int(QByteArray temp);
-    static char ConvertHexChar(char ch);
-    static QByteArray QString2Hex(QString str);
-    void SendControlData();
-    QSerialPort serial; // declare a serial com
 
 private slots:
-    void readMyCom();
-    void SerialInit(const QString portName, const QString baudRate, const QString dataBits, const QString stopBits);
-    void SerialClose();
-    void MotorParamRec(bool TensionOrAngle, unsigned int *Data);
+    void UiParamRec(bool TensionOrAngle, unsigned int *Data);
 
 signals:
-    void SerialOpenSucc();
-    void SerialOpenFail();
+    void MotorParamSend(unsigned int *torque);
+
 };
 
 #endif // MOTORCONTROL_H

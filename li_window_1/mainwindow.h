@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QtCore>
-//#include "win_qextserialport.h"
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QStandardItemModel>
@@ -18,11 +17,8 @@
 #include "plotcurves.h"
 //#include "motorcontrol.h"
 class MotorControl;
-//#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPort>
 //#include "myglwidget.h"
-//#include "C:/Advantech/DAQNavi/Inc/bdaqctrl.h"
-//#include "LpmsSensorI.h"
-//#include "LpmsSensorManagerI.h"
 
 // set the read/write com delay
 //#define TIME_OUT  2
@@ -46,7 +42,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void startInit();
-    //QSerialPort serial; // declare a serial com
+
 
 protected:
     void setActionsEnable(bool status);
@@ -61,7 +57,7 @@ private slots:
     void on_actionSave_triggered();
     void on_actionClean_triggered();
     void on_sendmsgButton_clicked();
-    //void readMyCom();
+    void readMyCom();
     void plot();
     void setLine1EditValue();
     void setLine2EditValue();
@@ -74,8 +70,7 @@ private slots:
     void setLine9EditValue();
     void setLine10EditValue();
     void Plot_Init();
-    void openSerialSucc();
-    void openSerialFail();
+    void MotorSendControl(unsigned int *Motparam);
 
     void on_Openglaction_triggered();
 
@@ -85,10 +80,7 @@ private slots:
 
 private:
     aboutdialog aboutdlg;
-    //int QByteArray2Int(QByteArray temp);
-    //static char ConvertHexChar(char ch);
-    //static QByteArray QString2Hex(QString str);
-    //QTimer *rece_timer;
+    QSerialPort serial; // declare a serial com
     QTimer *plot_timer;
     unsigned int plot_timerdly;//set the serial port receive/send interval
     unsigned int rece_timerdly;
@@ -97,8 +89,6 @@ private:
     Ui::MainWindow *ui;
 
 signals:
-    void serialInitial(const QString portName, const QString baudRate, const QString dataBits, const QString stopBits);
-    void serialCloseSig();
     void serialControl(bool TensionOrAngle, unsigned int *Data);
 };
 
