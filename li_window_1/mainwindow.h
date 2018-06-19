@@ -83,7 +83,6 @@ private:
     QSerialPort serial; // declare a serial com
     QTimer *plot_timer;
     unsigned int plot_timerdly;//set the serial port receive/send interval
-    unsigned int rece_timerdly;
     GetSensordata *getsensordata;
     MotorControl *motorcontrol;
     Ui::MainWindow *ui;
