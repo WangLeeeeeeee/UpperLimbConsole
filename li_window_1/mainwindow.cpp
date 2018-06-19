@@ -20,7 +20,7 @@ unsigned int RcvBufNum;
 unsigned char RcvBuf[RcvBufSize];
 bool new_flag=0;
 
-unsigned int MAXSPEED = 3000;
+unsigned int MAXSPEED = 2000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -1124,6 +1124,37 @@ void MainWindow::readMyCom()
 void MainWindow::MotorSendControl(unsigned int *Motparam)
 {
     QString SendData;
+
+    for(int i=0; i<10; i++)
+    {
+        // MOTOR0 absolute position
+        SendData = QString::number(long(Motparam[0] * 255));
+        SendData = "0LA" + SendData + "\r";
+        serial.write(SendData.toLatin1());
+
+
+        // MOTOR1 absolute position
+        SendData = QString::number(long(-1 * Motparam[0] * 255));
+        SendData = "1LA" + SendData + "\r";
+        serial.write(SendData.toLatin1());
+
+
+        // MOTOR acceleration
+        SendData = "AC" + QString::number(5) + "\r";
+        serial.write(SendData.toLatin1());
+        SendData = "DEC" + QString::number(5) + "\r";
+        serial.write(SendData.toLatin1());
+
+        // MOTOR MAX SPEED
+        SendData = "SP" + QString::number(MAXSPEED) + "\r";
+        serial.write(SendData.toLatin1());
+
+        // Send M to start the control
+        SendData = "M\r";
+        serial.write(SendData.toLatin1());
+    }
+
+    /*
     for(int i=0; i<10; i++)
     {
         // Motor 0
@@ -1136,4 +1167,22 @@ void MainWindow::MotorSendControl(unsigned int *Motparam)
         SendData = "1C" + SendData + "\r";
         serial.write(SendData.toLatin1());
     }
+    */
+    /*
+    if((tension_y5[receive_count_tension-1] > 800) || (tension_y6[receive_count_tension-1] > 800))
+    {
+        for(int i=0; i<10; i++)
+        {
+            // Motor 0
+            SendData = QString::number(0);
+            SendData = "0V" + SendData + "\r";
+            serial.write(SendData.toLatin1());
+
+            // Motor 1
+            SendData = QString::number(0);
+            SendData = "1V" + SendData + "\r";
+            serial.write(SendData.toLatin1());
+        }
+    }
+    */
 }
