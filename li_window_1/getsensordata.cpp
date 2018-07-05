@@ -146,6 +146,7 @@ void GetSensordata::run()
 
 
             // Shows data
+            /*
             qDebug()<< "elbow_x: "<<elbow_x[receive_count_angle]<<endl;
             qDebug()<< "elbow_y: "<<elbow_y[receive_count_angle]<<endl;
             qDebug()<< "elbow_z: "<<elbow_z[receive_count_angle]<<endl;
@@ -159,6 +160,7 @@ void GetSensordata::run()
             qDebug()<< "shoulder_x_acc: "<<shoulder_x_acc[receive_count_angle]<<endl;
             qDebug()<< "shoulder_x_acc: "<<shoulder_x_acc[receive_count_angle]<<endl;
             qDebug()<<"receive_count_angle"<<receive_count_angle<<endl;
+            */
 
             receive_count_angle++;
             time_x_angle[receive_count_angle] = receive_count_angle * 0.5;
@@ -166,7 +168,7 @@ void GetSensordata::run()
 
         // Step 6: The device is acquiring data.
         wfAiCtrl->Start();
-        Sleep(500);// every 500ms collect once
+        Sleep(50);// every 500ms collect once
    }
 
 }
@@ -221,6 +223,7 @@ void GetSensordata::OnStoppedEvent(void * sender, BfdAiEventArgs * args, void * 
     surpressure_shou1[receive_count_pressure]   /=      (getDataCount / 9);
     surpressure_shou2[receive_count_pressure]   /=      (getDataCount / 9);
 
+    /*
     qDebug()<<"Tension1:"<<tension_y[receive_count_tension];
     qDebug()<<"Tension2:"<<tension_y2[receive_count_tension];
     qDebug()<<"Tension3:"<<tension_y3[receive_count_tension];
@@ -232,6 +235,7 @@ void GetSensordata::OnStoppedEvent(void * sender, BfdAiEventArgs * args, void * 
     qDebug()<<"shoulder Surface pressure:"<<surpressure_shou2[receive_count_pressure];
     qDebug()<<"receive_count_tension:"<<receive_count_tension;
     qDebug()<<"receive_count_pressure"<<receive_count_pressure;
+    */
 
     // Change the voltage(v) to Tension(g)
     tension_y[receive_count_tension]  =   TENSION_K[0] * tension_y[receive_count_tension] + TENSION_B[0];

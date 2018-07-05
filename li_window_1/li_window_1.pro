@@ -2,6 +2,11 @@
 #
 # Project created by QtCreator 2017-01-13T21:21:24
 #
+# Name format standard:
+#       Function:   small letter begin like: serialInit()
+#       Signal:     sig- like: sigSerialInit()
+#       Slot:       slot- like: slotSerialInit()
+#       Constant:   all big letter like: MAXSPEED
 #-------------------------------------------------
 
 QT       += core gui

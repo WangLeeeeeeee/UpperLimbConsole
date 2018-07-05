@@ -20,7 +20,7 @@ unsigned int RcvBufNum;
 unsigned char RcvBuf[RcvBufSize];
 bool new_flag=0;
 
-unsigned int MAXSPEED = 2000;
+unsigned int MAXSPEED = 3247;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     motorcontrol = new MotorControl;
 
     // Before connect object must be instantiation!!!
+    connect(this, SIGNAL(sigSerialInit()), motorcontrol, SLOT(slotSerialInit()));
+    connect(this, SIGNAL(sigBeforeTigh()), motorcontrol, SLOT(slotBeforeTigh()));
     connect(this, SIGNAL(serialControl(bool,uint*)), motorcontrol, SLOT(UiParamRec(bool,uint*)));
     connect(motorcontrol, SIGNAL(MotorParamSend(uint*)), this, SLOT(MotorSendControl(uint*)));
 }
@@ -332,6 +334,8 @@ void MainWindow::setComboxEnable(bool status)
 //
 void MainWindow::on_actionOpen_triggered()
 {
+    emit sigSerialInit();
+    /*
     serial.setPortName(ui->portNameComboBox->currentText());
 
     if(ui->baudRateCombox->currentText()==tr("9600"))
@@ -385,13 +389,14 @@ void MainWindow::on_actionOpen_triggered()
     ui->actionAdd->setEnabled(false);
 
     setActionsEnable(true);
+    */
 }
 
 //
 void MainWindow::on_actionClose_triggered()
 {
     //plot_timer->stop();
-    serial.close();
+    //serial.close();
     setComboxEnable(true);
 
     ui->actionOpen->setEnabled(true);
@@ -1112,6 +1117,7 @@ void MainWindow::on_dataStopGetButton_clicked()
     plot_timer->stop();
 }
 
+/*
 void MainWindow::readMyCom()
 {
     QByteArray temp = serial.readAll();
@@ -1120,13 +1126,32 @@ void MainWindow::readMyCom()
 
     }
 }
+*/
 
 void MainWindow::MotorSendControl(unsigned int *Motparam)
 {
+    /*
     QString SendData;
 
     for(int i=0; i<10; i++)
     {
+        // MOTOR6 absolute position
+        SendData = QString::number(long(-68063));
+        SendData = "4LA" + SendData + "\r";
+        serial.write(SendData.toLatin1());
+
+        // MOTOR acceleration
+        SendData = "4AC" + QString::number(5) + "\r";
+        serial.write(SendData.toLatin1());
+
+        // MOTOR MAX SPEED
+        SendData = "4SP" + QString::number(MAXSPEED) + "\r";
+        serial.write(SendData.toLatin1());
+
+        // Send M to start the control
+        SendData = "M\r";
+        serial.write(SendData.toLatin1());
+        /*
         // MOTOR0 absolute position
         SendData = QString::number(long(Motparam[0] * 255));
         SendData = "0LA" + SendData + "\r";
@@ -1152,7 +1177,9 @@ void MainWindow::MotorSendControl(unsigned int *Motparam)
         // Send M to start the control
         SendData = "M\r";
         serial.write(SendData.toLatin1());
+
     }
+     */
 
     /*
     for(int i=0; i<10; i++)
@@ -1185,4 +1212,10 @@ void MainWindow::MotorSendControl(unsigned int *Motparam)
         }
     }
     */
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    // 预紧信号发送
+    emit sigBeforeTigh();
 }

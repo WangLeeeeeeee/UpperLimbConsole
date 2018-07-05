@@ -533,7 +533,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -777,7 +777,7 @@
      <widget class="QPushButton" name="dataGetButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>20</x>
         <y>330</y>
         <width>111</width>
         <height>31</height>
@@ -790,14 +790,27 @@
      <widget class="QPushButton" name="dataStopGetButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>380</y>
+        <x>20</x>
+        <y>370</y>
         <width>111</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>DataGetStop</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>350</y>
+        <width>111</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>BeforeTighten</string>
       </property>
      </widget>
     </widget>

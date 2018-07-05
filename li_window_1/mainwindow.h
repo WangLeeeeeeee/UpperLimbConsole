@@ -17,7 +17,7 @@
 #include "plotcurves.h"
 //#include "motorcontrol.h"
 class MotorControl;
-#include <QtSerialPort/QSerialPort>
+//#include <QtSerialPort/QSerialPort> //put the com send data in motorcontrol
 //#include "myglwidget.h"
 
 // set the read/write com delay
@@ -57,7 +57,7 @@ private slots:
     void on_actionSave_triggered();
     void on_actionClean_triggered();
     void on_sendmsgButton_clicked();
-    void readMyCom();
+    //void readMyCom();
     void plot();
     void setLine1EditValue();
     void setLine2EditValue();
@@ -78,9 +78,11 @@ private slots:
 
     void on_dataStopGetButton_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     aboutdialog aboutdlg;
-    QSerialPort serial; // declare a serial com
+    //QSerialPort serial; // declare a serial com
     QTimer *plot_timer;
     unsigned int plot_timerdly;//set the serial port receive/send interval
     GetSensordata *getsensordata;
@@ -88,6 +90,8 @@ private:
     Ui::MainWindow *ui;
 
 signals:
+    void sigSerialInit();
+    void sigBeforeTigh();
     void serialControl(bool TensionOrAngle, unsigned int *Data);
 };
 
