@@ -36,8 +36,8 @@ double max_tension[6] = {0, 0, 0, 0, 0, 0};
 //----------------------------------------------------------------------------------
 //double TENSION_K[6] = {995.94, 989.03, 1000.8, 1001.1, 1129.9, 993.33};
 //double TENSION_B[6] = {203.71, 12.242, 52.057, -80.687, -320.2, -61.373};
-double TENSION_K[6] = {995.94, 989.03, 1000.8, 1001.1, 1001.1, 993.33};
-double TENSION_B[6] = {203.71, 12.242, 52.057, -80.687, -80.687, -61.373};
+double TENSION_K[6] = {995.94, 989.03, 1000.8, 1001.1, 1413.4, 993.33};
+double TENSION_B[6] = {203.71, 12.242, 52.057, -80.687, -1351.8, -61.373};
 
 //-----------------------------------------------------------------------------------
 // Configure the following parameters before running the PCI-1716L
@@ -163,7 +163,7 @@ void GetSensordata::run()
             */
 
             receive_count_angle++;
-            time_x_angle[receive_count_angle] = receive_count_angle * 0.5;
+            time_x_angle[receive_count_angle] = receive_count_angle * 0.05;
         }
 
         // Step 6: The device is acquiring data.
@@ -208,8 +208,8 @@ void GetSensordata::OnStoppedEvent(void * sender, BfdAiEventArgs * args, void * 
     }
 
     // Set the x-axis data
-    time_x_tension[receive_count_tension] = 0.5 * receive_count_tension;
-    time_x_surpressure[receive_count_pressure] = 0.5 * receive_count_pressure;
+    time_x_tension[receive_count_tension] = 0.05 * receive_count_tension;
+    time_x_surpressure[receive_count_pressure] = 0.05 * receive_count_pressure;
 
 
     // Average filter

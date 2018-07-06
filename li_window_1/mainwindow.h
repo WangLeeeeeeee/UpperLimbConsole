@@ -27,7 +27,7 @@ class MotorControl;
 //#define TIMER_INTERVAL 10
 
 // set the plot interval
-#define TIME_PLOT_INTERVAL 200
+#define TIME_PLOT_INTERVAL 100
 
 
 namespace Ui {
@@ -92,7 +92,7 @@ private:
 signals:
     void sigSerialInit();
     void sigBeforeTigh();
-    void serialControl(bool TensionOrAngle, unsigned int *Data);
+    void sigSerialCtrl(bool TensionOrAngle, unsigned int *Data);
 };
 
 #endif // MAINWINDOW_H

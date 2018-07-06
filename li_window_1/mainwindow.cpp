@@ -913,40 +913,46 @@ void MainWindow::plot()
 {
 
     //  Six tension value figure
-    if(receive_count_tension > 10)
-        shift_x_tension = receive_count_tension*0.5 - 5;
-    if(receive_count_angle > 10)
-        shift_x_angle = receive_count_angle*0.5 -5;
-    if(receive_count_pressure > 10)
-        shift_x_pressure = receive_count_pressure*0.5 -5;
+    if(receive_count_tension > 1)
+        shift_x_tension = receive_count_tension*0.05 - 0.5;
+    if(receive_count_angle > 1)
+        shift_x_angle = receive_count_angle*0.05 - 0.5;
+    if(receive_count_pressure > 1)
+        shift_x_pressure = receive_count_pressure*0.05 - 0.5;
+
+    QPen pen;
+    pen.setStyle(Qt::SolidLine);
+    pen.setWidth(3);
+    pen.setBrush(Qt::red);
 
     ui->qCustomPlot->graph(0)->setData(time_x_tension,tension_y);
-    ui->qCustomPlot->xAxis->setRange(shift_x_tension,(receive_count_tension-1)*0.5);
+    ui->qCustomPlot->graph(0)->setPen(pen);
+    ui->qCustomPlot->xAxis->setRange(shift_x_tension,(receive_count_tension-1)*0.05);
     ui->qCustomPlot->yAxis->setRange(0,max_tension[0]*1.1);
     ui->qCustomPlot->replot();
 
     ui->qCustomPlot2->graph(0)->setData(time_x_tension,tension_y2);
-    ui->qCustomPlot2->xAxis->setRange(shift_x_tension,receive_count_tension*0.5);
+    ui->qCustomPlot2->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot2->yAxis->setRange(0,max_tension[1]*1.1);
     ui->qCustomPlot2->replot();
 
     ui->qCustomPlot3->graph(0)->setData(time_x_tension,tension_y3);
-    ui->qCustomPlot3->xAxis->setRange(shift_x_tension,receive_count_tension*0.5);
+    ui->qCustomPlot3->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot3->yAxis->setRange(0,max_tension[2]*1.1);
     ui->qCustomPlot3->replot();
 
     ui->qCustomPlot4->graph(0)->setData(time_x_tension,tension_y4);
-    ui->qCustomPlot4->xAxis->setRange(shift_x_tension,receive_count_tension*0.5);
+    ui->qCustomPlot4->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot4->yAxis->setRange(0,max_tension[3]*1.1);
     ui->qCustomPlot4->replot();
 
     ui->qCustomPlot5->graph(0)->setData(time_x_tension,tension_y5);
-    ui->qCustomPlot5->xAxis->setRange(shift_x_tension,receive_count_tension*0.5);
+    ui->qCustomPlot5->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot5->yAxis->setRange(0,max_tension[4]*1.1);
     ui->qCustomPlot5->replot();
 
     ui->qCustomPlot6->graph(0)->setData(time_x_tension,tension_y6);
-    ui->qCustomPlot6->xAxis->setRange(shift_x_tension,receive_count_tension*0.5);
+    ui->qCustomPlot6->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot6->yAxis->setRange(0,max_tension[5]*1.1);
     ui->qCustomPlot6->replot();
 
@@ -954,27 +960,27 @@ void MainWindow::plot()
     ui->qCustomPlot7->graph(0)->setData(time_x_angle,elbow_x);
     ui->qCustomPlot7->graph(1)->setData(time_x_angle,elbow_y);
     ui->qCustomPlot7->graph(2)->setData(time_x_angle,elbow_z);
-    ui->qCustomPlot7->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.5);
+    ui->qCustomPlot7->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.05);
     ui->qCustomPlot7->yAxis->setRange(-360,360);
     ui->qCustomPlot7->replot();
 
     ui->qCustomPlot8->graph(0)->setData(time_x_angle,shoulder_x);
     ui->qCustomPlot8->graph(1)->setData(time_x_angle,shoulder_y);
     ui->qCustomPlot8->graph(2)->setData(time_x_angle,shoulder_z);
-    ui->qCustomPlot8->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.5);
+    ui->qCustomPlot8->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.05);
     ui->qCustomPlot8->yAxis->setRange(-360,360);
     ui->qCustomPlot8->replot();
 
     // Elbow surface pressure figure
     ui->elbpresPlot->graph(0)->setData(time_x_surpressure,surpressure_elbow);
-    ui->elbpresPlot->xAxis->setRange(shift_x_pressure,receive_count_pressure*0.5);
+    ui->elbpresPlot->xAxis->setRange(shift_x_pressure,receive_count_pressure*0.05);
     ui->elbpresPlot->yAxis->setRange(0,5);
     ui->elbpresPlot->replot();
 
     // Shoulder surface pressure figure
     ui->shopresPlot->graph(0)->setData(time_x_surpressure,surpressure_shou1);
     ui->shopresPlot->graph(1)->setData(time_x_surpressure,surpressure_shou2);
-    ui->shopresPlot->xAxis->setRange(shift_x_pressure,receive_count_pressure*0.5);
+    ui->shopresPlot->xAxis->setRange(shift_x_pressure,receive_count_pressure*0.05);
     ui->shopresPlot->yAxis->setRange(0,5);
     ui->shopresPlot->replot();
 

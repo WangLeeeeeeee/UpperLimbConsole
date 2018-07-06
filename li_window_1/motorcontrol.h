@@ -20,7 +20,7 @@ typedef struct PID_TENSION
 
 
 // set the com send interval
-#define TIME_SEND_INTERVAL 100
+#define TIME_SEND_INTERVAL 50
 
 class MotorControl:public QThread
 {
@@ -37,14 +37,12 @@ private:
     void UpdateAllState(void);
 
 private slots:
-    void UiParamRec(bool TensionOrAngle, unsigned int *Data);
+    void slotUiParRec(bool TensionOrAngle, unsigned int *Data);
     void readMyCom1();
     void sendCommand();
     void slotSerialInit();
     void slotBeforeTigh();
 
-signals:
-    void MotorParamSend(unsigned int *torque);
 
 };
 

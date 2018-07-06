@@ -21,11 +21,12 @@ typedef struct Control
     float Vel_out;
     float Error_Integer;
 }Control;
-PID_TENSION TENSION_PID[6]={{0.4,0,1,0,0},{1,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
+PID_TENSION TENSION_PID[6]={{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0}};
+PID_TENSION TENSION_PID_1[6]={{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0}};
 Control Now;
 Control Past;
-float MAXSPEED=2000;
-float MINSPEED=-2000;
+float MAXSPEED=300;
+float MINSPEED=-200;
 float tension_cnt[6];
 float tension_ctrlval[6];
 
@@ -38,10 +39,10 @@ MotorControl::MotorControl(QObject *parent):QThread(parent)
 void MotorControl::run()
 {
 
-    for(int i=0; i<6; i++)
-    {
-        MotorParam[i] = UI[i];
-    }
+    //for(int i=0; i<6; i++)
+    //{
+        //MotorParam[i] = UI[i];
+    //}
 /*
     tensionCnt[0] = tension_y[receive_count_tension];
     tensionCnt[1] = tension_y2[receive_count_tension];
@@ -51,13 +52,22 @@ void MotorControl::run()
     tensionCnt[5] = tension_y6[receive_count_tension];
     */
 
-    emit MotorParamSend(MotorParam);
+    //emit MotorParamSend(MotorParam);
 }
 
 
 
 void MotorControl::UiParamRec(bool TensionOrAngle, unsigned int *Data)
 {
+    if(TensionOrAngle == 0)
+    {
+        control_mode = 1;
+        for(int i=0; i<6; i++)
+        {
+            tension_ctrlval[i] = Data[i];
+        }
+    }
+
     /*
     ControlMode = TensionOrAngle;
     for(int i=0; i<6; i++)
@@ -83,12 +93,10 @@ void MotorControl::sendCommand()
     case 0:
         qDebug()<<"now the control mode is 0"; break; // do nothing
     case 1:
-        Tension_Control(0,tension_ctrlval[0]);break;
-        /*
         for(int i=0; i<6; i++){
             Tension_Control(i,tension_ctrlval[i]);
         }break;
-        */
+
     }
 
 }
@@ -125,12 +133,13 @@ void MotorControl::slotSerialInit()
 void MotorControl::UpdateAllState()
 {
     tension_cnt[0] = tension_y[receive_count_tension-1];
-    qDebug()<<"now the tension is: "<<tension_cnt[0]<<endl;
-    tension_cnt[1] = tension_y2[receive_count_tension];
-    tension_cnt[2] = tension_y3[receive_count_tension];
-    tension_cnt[3] = tension_y4[receive_count_tension];
-    tension_cnt[4] = tension_y5[receive_count_tension];
-    tension_cnt[5] = tension_y6[receive_count_tension];
+    tension_cnt[1] = tension_y2[receive_count_tension-1];
+    tension_cnt[2] = tension_y3[receive_count_tension-1];
+    tension_cnt[3] = tension_y4[receive_count_tension-1];
+    tension_cnt[4] = tension_y5[receive_count_tension-1];
+    tension_cnt[5] = tension_y6[receive_count_tension-1];
+
+    qDebug()<<"now the tension is: "<<tension_cnt[2]<<endl;
 }
 
 // Calculate PID
@@ -156,11 +165,12 @@ void MotorControl::Tension_Control(int index,float i)
     float speed_out;
 
     UpdateAllState();
+    qDebug()<<"the aim tension is:"<<i<<endl;
 
     Now.TensionCnt=tension_cnt[index];
     Now.Tension_error=i-Now.TensionCnt;
 
-    if((Now.Tension_error>50)||(Now.Tension_error<-50))
+    if(Now.Tension_error>100)
     {
         static float Vel_out_last=0;
         Now.Vel_out=PID_Calculate((TENSION_PID+index),Now.Tension_error);
@@ -170,15 +180,51 @@ void MotorControl::Tension_Control(int index,float i)
         Past.TensionCnt=Now.TensionCnt;
         speed_out=Now.Vel_out+Vel_out_last;
 
-        if(speed_out>MAXSPEED)	speed_out=MAXSPEED;
-        if(speed_out<MINSPEED)	speed_out=MINSPEED;
+        //if(speed_out>MAXSPEED)	speed_out=MAXSPEED;
+        //if(speed_out<MINSPEED)	speed_out=MINSPEED;
 
         Vel_out_last=speed_out;
     }
+    else if(Now.Tension_error<-100)
+    {
+        static float Vel_out_last=0;
+        Now.Vel_out=PID_Calculate((TENSION_PID_1+index),Now.Tension_error);
+        Past.Tension_error=Now.Tension_error;
+        Past.Vel_out=Now.Vel_out;
+        Past.Error_Integer=Now.Error_Integer;
+        Past.TensionCnt=Now.TensionCnt;
+        speed_out=Now.Vel_out+Vel_out_last;
+
+        //if(speed_out>MAXSPEED)	speed_out=MAXSPEED;
+        //if(speed_out<MINSPEED)	speed_out=MINSPEED;
+
+        Vel_out_last=speed_out;
+    }
+    /*
+    if((Now.Tension_error>100)||(Now.Tension_error<-100))
+    {
+        static float Vel_out_last=0;
+        Now.Vel_out=PID_Calculate((TENSION_PID+index),Now.Tension_error);
+        Past.Tension_error=Now.Tension_error;
+        Past.Vel_out=Now.Vel_out;
+        Past.Error_Integer=Now.Error_Integer;
+        Past.TensionCnt=Now.TensionCnt;
+        speed_out=Now.Vel_out+Vel_out_last;
+
+        //if(speed_out>MAXSPEED)	speed_out=MAXSPEED;
+        //if(speed_out<MINSPEED)	speed_out=MINSPEED;
+
+        Vel_out_last=speed_out;
+    }
+    */
     else speed_out=0;
 
-    SendData = QString::number(long(index)) + "V" + QString::number(long(speed_out)) + "\r";
+    SendData = QString::number(long(index)) + "SP" + QString::number(long(MAXSPEED)) + "\r";
+    serial1.write(SendData.toLatin1());
+    SendData = QString::number(long(index)) + "LR" + QString::number(long(speed_out)) + "\r";
     qDebug()<<SendData<<endl;
+    serial1.write(SendData.toLatin1());
+    SendData = "M\r";
     serial1.write(SendData.toLatin1());
 }
 
