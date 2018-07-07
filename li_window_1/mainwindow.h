@@ -70,7 +70,6 @@ private slots:
     void setLine9EditValue();
     void setLine10EditValue();
     void Plot_Init();
-    void MotorSendControl(unsigned int *Motparam);
 
     void on_Openglaction_triggered();
 

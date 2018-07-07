@@ -21,8 +21,8 @@ typedef struct Control
     float Vel_out;
     float Error_Integer;
 }Control;
-PID_TENSION TENSION_PID[6]={{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0}};
-PID_TENSION TENSION_PID_1[6]={{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0},{0.6,0,0.5,0,0}};
+PID_TENSION TENSION_PID[6]={{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0}};
+PID_TENSION TENSION_PID_1[6]={{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0},{1.6,0,0.5,0,0}};
 Control Now;
 Control Past;
 float MAXSPEED=300;
@@ -39,30 +39,16 @@ MotorControl::MotorControl(QObject *parent):QThread(parent)
 void MotorControl::run()
 {
 
-    //for(int i=0; i<6; i++)
-    //{
-        //MotorParam[i] = UI[i];
-    //}
-/*
-    tensionCnt[0] = tension_y[receive_count_tension];
-    tensionCnt[1] = tension_y2[receive_count_tension];
-    tensionCnt[2] = tension_y3[receive_count_tension];
-    tensionCnt[3] = tension_y4[receive_count_tension];
-    tensionCnt[4] = tension_y5[receive_count_tension];
-    tensionCnt[5] = tension_y6[receive_count_tension];
-    */
-
-    //emit MotorParamSend(MotorParam);
 }
 
 
 
-void MotorControl::UiParamRec(bool TensionOrAngle, unsigned int *Data)
+void MotorControl::slotUiParRec(bool TensionOrAngle, unsigned int *Data)
 {
     if(TensionOrAngle == 0)
     {
         control_mode = 1;
-        for(int i=0; i<6; i++)
+        for(int i=0; i<4; i++)
         {
             tension_ctrlval[i] = Data[i];
         }
@@ -74,6 +60,10 @@ void MotorControl::UiParamRec(bool TensionOrAngle, unsigned int *Data)
     {
         UI[i] = Data[i];
     }
+
+
+
+
     qDebug()<<UI;
     */
 }

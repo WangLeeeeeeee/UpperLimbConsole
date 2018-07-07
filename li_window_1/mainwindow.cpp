@@ -37,8 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Before connect object must be instantiation!!!
     connect(this, SIGNAL(sigSerialInit()), motorcontrol, SLOT(slotSerialInit()));
     connect(this, SIGNAL(sigBeforeTigh()), motorcontrol, SLOT(slotBeforeTigh()));
-    connect(this, SIGNAL(serialControl(bool,uint*)), motorcontrol, SLOT(UiParamRec(bool,uint*)));
-    connect(motorcontrol, SIGNAL(MotorParamSend(uint*)), this, SLOT(MotorSendControl(uint*)));
+    connect(this, SIGNAL(sigSerialCtrl(bool,uint*)), motorcontrol, SLOT(UiParamRec(bool,uint*)));
 }
 
 MainWindow::~MainWindow()
@@ -887,7 +886,7 @@ void MainWindow::on_sendmsgButton_clicked()
         sendData[3] = ui->sendMsgLineEdit10->text().toUInt();
         sendData[4] = 0;
         sendData[5] = 0;
-        emit serialControl(TensionOrAngle, sendData);
+        emit sigSerialCtrl(TensionOrAngle, sendData);
         motorcontrol->start();
     }
     else if(ui->cabel_RadioButton->isChecked())
@@ -899,7 +898,7 @@ void MainWindow::on_sendmsgButton_clicked()
         sendData[3] = ui->sendMsgLineEdit4->text().toUInt();
         sendData[4] = ui->sendMsgLineEdit5->text().toUInt();
         sendData[5] = ui->sendMsgLineEdit6->text().toUInt();
-        emit serialControl(TensionOrAngle, sendData);
+        emit sigSerialCtrl(TensionOrAngle, sendData);
         motorcontrol->start();
     }
     else
@@ -1133,92 +1132,6 @@ void MainWindow::readMyCom()
     }
 }
 */
-
-void MainWindow::MotorSendControl(unsigned int *Motparam)
-{
-    /*
-    QString SendData;
-
-    for(int i=0; i<10; i++)
-    {
-        // MOTOR6 absolute position
-        SendData = QString::number(long(-68063));
-        SendData = "4LA" + SendData + "\r";
-        serial.write(SendData.toLatin1());
-
-        // MOTOR acceleration
-        SendData = "4AC" + QString::number(5) + "\r";
-        serial.write(SendData.toLatin1());
-
-        // MOTOR MAX SPEED
-        SendData = "4SP" + QString::number(MAXSPEED) + "\r";
-        serial.write(SendData.toLatin1());
-
-        // Send M to start the control
-        SendData = "M\r";
-        serial.write(SendData.toLatin1());
-        /*
-        // MOTOR0 absolute position
-        SendData = QString::number(long(Motparam[0] * 255));
-        SendData = "0LA" + SendData + "\r";
-        serial.write(SendData.toLatin1());
-
-
-        // MOTOR1 absolute position
-        SendData = QString::number(long(-1 * Motparam[0] * 255));
-        SendData = "1LA" + SendData + "\r";
-        serial.write(SendData.toLatin1());
-
-
-        // MOTOR acceleration
-        SendData = "AC" + QString::number(5) + "\r";
-        serial.write(SendData.toLatin1());
-        SendData = "DEC" + QString::number(5) + "\r";
-        serial.write(SendData.toLatin1());
-
-        // MOTOR MAX SPEED
-        SendData = "SP" + QString::number(MAXSPEED) + "\r";
-        serial.write(SendData.toLatin1());
-
-        // Send M to start the control
-        SendData = "M\r";
-        serial.write(SendData.toLatin1());
-
-    }
-     */
-
-    /*
-    for(int i=0; i<10; i++)
-    {
-        // Motor 0
-        SendData = QString::number(Motparam[0]);
-        SendData = "0C" + SendData + "\r";
-        serial.write(SendData.toLatin1());
-
-        // Motor 1
-        SendData = QString::number(Motparam[1]);
-        SendData = "1C" + SendData + "\r";
-        serial.write(SendData.toLatin1());
-    }
-    */
-    /*
-    if((tension_y5[receive_count_tension-1] > 800) || (tension_y6[receive_count_tension-1] > 800))
-    {
-        for(int i=0; i<10; i++)
-        {
-            // Motor 0
-            SendData = QString::number(0);
-            SendData = "0V" + SendData + "\r";
-            serial.write(SendData.toLatin1());
-
-            // Motor 1
-            SendData = QString::number(0);
-            SendData = "1V" + SendData + "\r";
-            serial.write(SendData.toLatin1());
-        }
-    }
-    */
-}
 
 void MainWindow::on_pushButton_clicked()
 {
