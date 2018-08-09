@@ -9,6 +9,7 @@
 #include <ActiveQt/QAxObject>
 #include <qdebug.h>
 #include "motorcontrol.h"
+#include "vrdisplay.h"
 
 
 unsigned int shift_x_tension = 0;
@@ -33,11 +34,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     getsensordata = new GetSensordata;
     motorcontrol = new MotorControl;
+    vrdisplay = new VRDisplay;
 
     // Before connect object must be instantiation!!!
     connect(this, SIGNAL(sigSerialInit()), motorcontrol, SLOT(slotSerialInit()));
+    connect(this, SIGNAL(sigSerialClose()), motorcontrol, SLOT(slotSerialClose()));
     connect(this, SIGNAL(sigBeforeTigh()), motorcontrol, SLOT(slotBeforeTigh()));
-    connect(this, SIGNAL(sigSerialCtrl(bool,uint*)), motorcontrol, SLOT(UiParamRec(bool,uint*)));
+    connect(this, SIGNAL(sigQianqu()), motorcontrol, SLOT(slotQianqu()));
+    connect(this, SIGNAL(sigWaizhan()), motorcontrol, SLOT(slotWaizhan()));
+    connect(this, SIGNAL(sigHuishou()), motorcontrol, SLOT(slotHuishou()));
+    connect(this, SIGNAL(sigHuishouWaizhan()), motorcontrol, SLOT(slotHuishouWaizhan()));
+    connect(this, SIGNAL(sigJianqianqu()), motorcontrol, SLOT(slotJianqianqu()));
+    connect(this, SIGNAL(sigHuishouJianqianqu()), motorcontrol, SLOT(slotHuishouJianqianqu()));
+    connect(this, SIGNAL(sigSerialCtrl(bool,uint*)), motorcontrol, SLOT(slotUiParRec(bool,uint*)));
+    connect(this,SIGNAL(sigVRSerialOpen()), vrdisplay, SLOT(slotVRSerialOpen()));
 }
 
 MainWindow::~MainWindow()
@@ -334,61 +344,11 @@ void MainWindow::setComboxEnable(bool status)
 void MainWindow::on_actionOpen_triggered()
 {
     emit sigSerialInit();
-    /*
-    serial.setPortName(ui->portNameComboBox->currentText());
-
-    if(ui->baudRateCombox->currentText()==tr("9600"))
-        serial.setBaudRate(QSerialPort::Baud9600);
-    else if(ui->baudRateCombox->currentText()==tr("115200"))
-        serial.setBaudRate(QSerialPort::Baud115200);
-    else if(ui->baudRateCombox->currentText()==tr("2400"))
-        serial.setBaudRate(QSerialPort::Baud2400);
-    else if(ui->baudRateCombox->currentText()==tr("4800"))
-        serial.setBaudRate(QSerialPort::Baud4800);
-    else if(ui->baudRateCombox->currentText()==tr("19200"))
-        serial.setBaudRate(QSerialPort::Baud19200);
-
-    if(ui->dataBitsComboBox->currentText()==tr("8"))
-        serial.setDataBits(QSerialPort::Data8);
-    else if(ui->dataBitsComboBox->currentText()==tr("7"))
-        serial.setDataBits(QSerialPort::Data7);
-    else if(ui->dataBitsComboBox->currentText()==tr("6"))
-        serial.setDataBits(QSerialPort::Data6);
-
-    if(ui->stopBitsComboBox->currentText()==tr("1"))
-        serial.setStopBits(QSerialPort::OneStop);
-    else if(ui->stopBitsComboBox->currentText()==tr("2"))
-        serial.setStopBits(QSerialPort::TwoStop);
-
-    serial.setFlowControl(QSerialPort::NoFlowControl);
-    serial.setParity(QSerialPort::NoParity);
-    serial.close();
-    if(serial.open(QIODevice::ReadWrite))
-    {
-        connect(&serial,SIGNAL(readyRead()),this,SLOT(readMyCom()));
-        QMessageBox::information(this,tr("open sucessful"),tr("sucessful open com")+ui->portNameComboBox->currentText(),QMessageBox::Ok);
-
-        // Set the motor the maxium speed
-        QString SendData;
-        SendData = QString::number(MAXSPEED);
-        SendData = "SP" + SendData + "\r";
-        for(int i=0; i<10; i++)
-        {
-            serial.write(SendData.toLatin1());
-        }
-    }
-    else
-    {
-        QMessageBox::critical(this,tr("open failed"),tr("cannot open com")+ui->portNameComboBox->currentText()+tr("\n com cannot be open or be used"),QMessageBox::Ok);
-        return;
-    }
-
     setComboxEnable(false);
     ui->actionOpen->setEnabled(false);
     ui->actionAdd->setEnabled(false);
 
     setActionsEnable(true);
-    */
 }
 
 //
@@ -407,6 +367,8 @@ void MainWindow::on_actionClose_triggered()
     ui->actionExit->setEnabled(true);
 
     ui->statusBar->showMessage(tr(""));
+
+    emit sigSerialClose();
 }
 
 //
@@ -899,7 +861,7 @@ void MainWindow::on_sendmsgButton_clicked()
         sendData[4] = ui->sendMsgLineEdit5->text().toUInt();
         sendData[5] = ui->sendMsgLineEdit6->text().toUInt();
         emit sigSerialCtrl(TensionOrAngle, sendData);
-        motorcontrol->start();
+        //motorcontrol->start();
     }
     else
     {
@@ -931,43 +893,59 @@ void MainWindow::plot()
     ui->qCustomPlot->replot();
 
     ui->qCustomPlot2->graph(0)->setData(time_x_tension,tension_y2);
+    ui->qCustomPlot2->graph(0)->setPen(pen);
     ui->qCustomPlot2->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot2->yAxis->setRange(0,max_tension[1]*1.1);
     ui->qCustomPlot2->replot();
 
     ui->qCustomPlot3->graph(0)->setData(time_x_tension,tension_y3);
+    ui->qCustomPlot3->graph(0)->setPen(pen);
     ui->qCustomPlot3->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot3->yAxis->setRange(0,max_tension[2]*1.1);
     ui->qCustomPlot3->replot();
 
     ui->qCustomPlot4->graph(0)->setData(time_x_tension,tension_y4);
+    ui->qCustomPlot4->graph(0)->setPen(pen);
     ui->qCustomPlot4->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
     ui->qCustomPlot4->yAxis->setRange(0,max_tension[3]*1.1);
     ui->qCustomPlot4->replot();
 
     ui->qCustomPlot5->graph(0)->setData(time_x_tension,tension_y5);
-    ui->qCustomPlot5->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
+    ui->qCustomPlot5->graph(0)->setPen(pen);
+    ui->qCustomPlot5->xAxis->setRange(0,receive_count_tension*0.05);
     ui->qCustomPlot5->yAxis->setRange(0,max_tension[4]*1.1);
     ui->qCustomPlot5->replot();
 
     ui->qCustomPlot6->graph(0)->setData(time_x_tension,tension_y6);
-    ui->qCustomPlot6->xAxis->setRange(shift_x_tension,receive_count_tension*0.05);
+    ui->qCustomPlot6->graph(0)->setPen(pen);
+    ui->qCustomPlot6->xAxis->setRange(0,receive_count_tension*0.05);
     ui->qCustomPlot6->yAxis->setRange(0,max_tension[5]*1.1);
     ui->qCustomPlot6->replot();
 
     // Elbow and Shoulder angle figure
     ui->qCustomPlot7->graph(0)->setData(time_x_angle,elbow_x);
+    ui->qCustomPlot7->graph(0)->setPen(pen);
+    pen.setBrush(Qt::green);
     ui->qCustomPlot7->graph(1)->setData(time_x_angle,elbow_y);
+    ui->qCustomPlot7->graph(1)->setPen(pen);
+    pen.setBrush(Qt::blue);
     ui->qCustomPlot7->graph(2)->setData(time_x_angle,elbow_z);
+    ui->qCustomPlot7->graph(2)->setPen(pen);
     ui->qCustomPlot7->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.05);
-    ui->qCustomPlot7->yAxis->setRange(-360,360);
+    ui->qCustomPlot7->yAxis->setRange(-120,120);
     ui->qCustomPlot7->replot();
 
+    pen.setBrush(Qt::red);
     ui->qCustomPlot8->graph(0)->setData(time_x_angle,shoulder_x);
+    ui->qCustomPlot8->graph(0)->setPen(pen);
+    pen.setBrush(Qt::green);
     ui->qCustomPlot8->graph(1)->setData(time_x_angle,shoulder_y);
+    ui->qCustomPlot8->graph(1)->setPen(pen);
+    pen.setBrush(Qt::blue);
     ui->qCustomPlot8->graph(2)->setData(time_x_angle,shoulder_z);
+    ui->qCustomPlot8->graph(2)->setPen(pen);
     ui->qCustomPlot8->xAxis->setRange(shift_x_angle,(receive_count_angle-1)*0.05);
-    ui->qCustomPlot8->yAxis->setRange(-360,360);
+    ui->qCustomPlot8->yAxis->setRange(-120,120);
     ui->qCustomPlot8->replot();
 
     // Elbow surface pressure figure
@@ -1137,4 +1115,39 @@ void MainWindow::on_pushButton_clicked()
 {
     // 预紧信号发送
     emit sigBeforeTigh();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    emit sigWaizhan();
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    emit sigQianqu();
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    emit sigHuishou();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    emit sigHuishouWaizhan();
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    emit sigJianqianqu();
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    emit sigHuishouJianqianqu();
+}
+
+void MainWindow::on_VRDisplay_clicked()
+{
+    emit sigVRSerialOpen();
 }

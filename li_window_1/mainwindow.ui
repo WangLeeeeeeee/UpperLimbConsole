@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1219</width>
-    <height>587</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -529,7 +529,7 @@
       <x>870</x>
       <y>10</y>
       <width>311</width>
-      <height>501</height>
+      <height>521</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -813,6 +813,84 @@
        <string>BeforeTighten</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>410</y>
+        <width>61</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>外展</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>410</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>肘前屈</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>450</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>肘前屈回收</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>450</y>
+        <width>61</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>外展回收</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_6">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>410</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>肩前屈</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_7">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>450</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>肩前屈回收</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -1069,7 +1147,7 @@
         <x>10</x>
         <y>280</y>
         <width>291</width>
-        <height>151</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="font">
@@ -1087,7 +1165,7 @@
          <x>0</x>
          <y>20</y>
          <width>281</width>
-         <height>142</height>
+         <height>151</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1196,8 +1274,8 @@
      <widget class="QPushButton" name="sendmsgButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>440</y>
+        <x>10</x>
+        <y>460</y>
         <width>101</width>
         <height>31</height>
        </rect>
@@ -1235,6 +1313,19 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="VRDisplay">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>460</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>VR</string>
+      </property>
      </widget>
     </widget>
    </widget>

@@ -15,7 +15,9 @@
 #include "aboutdialog.h"
 #include "getsensordata.h"
 #include "plotcurves.h"
+//#include "vrdisplay.h"
 //#include "motorcontrol.h"
+class VRDisplay;
 class MotorControl;
 //#include <QtSerialPort/QSerialPort> //put the com send data in motorcontrol
 //#include "myglwidget.h"
@@ -79,6 +81,20 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
+
+    void on_pushButton_6_clicked();
+
+    void on_pushButton_7_clicked();
+
+    void on_VRDisplay_clicked();
+
 private:
     aboutdialog aboutdlg;
     //QSerialPort serial; // declare a serial com
@@ -86,12 +102,21 @@ private:
     unsigned int plot_timerdly;//set the serial port receive/send interval
     GetSensordata *getsensordata;
     MotorControl *motorcontrol;
+    VRDisplay *vrdisplay;
     Ui::MainWindow *ui;
 
 signals:
     void sigSerialInit();
+    void sigSerialClose();
     void sigBeforeTigh();
+    void sigQianqu();
+    void sigWaizhan();
     void sigSerialCtrl(bool TensionOrAngle, unsigned int *Data);
+    void sigHuishou();
+    void sigHuishouWaizhan();
+    void sigJianqianqu();
+    void sigHuishouJianqianqu();
+    void sigVRSerialOpen();
 };
 
 #endif // MAINWINDOW_H

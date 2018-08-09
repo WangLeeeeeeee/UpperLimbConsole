@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     aboutdialog.cpp \
     getsensordata.cpp \
-    motorcontrol.cpp
+    motorcontrol.cpp \
+    vrdisplay.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -32,7 +33,8 @@ HEADERS  += mainwindow.h \
     LpmsSensorI.h \
     LpmsSensorManagerI.h \
     getsensordata.h \
-    motorcontrol.h
+    motorcontrol.h \
+    vrdisplay.h
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui

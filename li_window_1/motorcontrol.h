@@ -9,18 +9,18 @@
 //#include "currentpid.h"
 #include "getsensordata.h"
 
-typedef struct PID_TENSION
+typedef struct PID
 {
     float KP;
     float KI;
     float KD;
     float PreError;
     float LastError;
-}PID_TENSION;
+}PID;
 
 
 // set the com send interval
-#define TIME_SEND_INTERVAL 50
+#define TIME_SEND_INTERVAL 100
 
 class MotorControl:public QThread
 {
@@ -32,16 +32,24 @@ private:
     void run();
     QSerialPort serial1; // declare a serial com
     QTimer *send_timer;
-    float PID_Calculate(PID_TENSION *pid_tension,float ThisError);
-    void Tension_Control(int index,float i);
+    float PIDCalculate(PID *pid_tension,float ThisError);
+    void TensionControl(int index,float i);
+    void AngleControl(int index, float aim_angle);
     void UpdateAllState(void);
 
 private slots:
     void slotUiParRec(bool TensionOrAngle, unsigned int *Data);
     void readMyCom1();
-    void sendCommand();
+    void slotSendCommand();
     void slotSerialInit();
     void slotBeforeTigh();
+    void slotSerialClose();
+    void slotQianqu();
+    void slotWaizhan();
+    void slotHuishou();
+    void slotHuishouWaizhan();
+    void slotJianqianqu();
+    void slotHuishouJianqianqu();
 
 
 };

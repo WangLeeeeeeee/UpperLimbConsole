@@ -168,7 +168,7 @@ void GetSensordata::run()
 
         // Step 6: The device is acquiring data.
         wfAiCtrl->Start();
-        Sleep(50);// every 500ms collect once
+        Sleep(50);// every 50ms collect once
    }
 
 }
